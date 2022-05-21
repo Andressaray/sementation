@@ -8,6 +8,9 @@ from deep_translator import GoogleTranslator
 from nltk.stem import PorterStemmer
 from nltk.stem import WordNetLemmatizer
 
+bag_words = {}
+
+nltk.download('wordnet')
 file = pd.read_csv("Sentimientos.tsv", sep='\t')
 pStemmer = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
@@ -27,11 +30,16 @@ def delete_accents(text = ''):
   for a, b in replacements:
     text = text.replace(a, b).replace(a, b)
   return text
+  
 def conver_verbs(list_words = []):
   list_verbs = []
   for word in list_words:
     aux_text = pStemmer.stem(word)
     aux_text = lemmatizer.lemmatize(word)
+    if aux_text in bag_words:
+      bag_words[aux_text] = bag_words[aux_text] + 1
+    else: 
+      bag_words[aux_text] = 1
     list_verbs.append(aux_text)
   return list_verbs
 
@@ -71,7 +79,7 @@ def clean_tweets(key = ''):
       aux_text = re.sub("([0-9]+)", '', text)
       aux_text = re.sub("'[^A-Za-z]+'", '', aux_text)
       aux_text = aux_text.lower()
-      aux_text = re.sub("([.;,:¡!¿?()@*$-//…])+", ' ', aux_text)
+      aux_text = re.sub("([.;,:¡!¿?()@*$-//…‼º°´’»|”“ªâ˜ <>\\=#])+", ' ', aux_text)
       aux_text = delete_emojis(aux_text)
       aux_text = delete_accents(aux_text)
       # aux_text = self.traslate_word(aux_text)
@@ -81,6 +89,9 @@ def clean_tweets(key = ''):
       list_words_dirty.append(conver_verbs(aux_text))
   return list_words_dirty
 listWordsTitle = clean_tweets('Title')
-print(listWordsTitle)
+# print(listWordsTitle)
+
+bag_words = sorted(bag_words.items(), key = lambda kv:(kv[0], kv[1]))
+print(bag_words)
 # listWordsOpinion = clean_tweets('Opinion')
 

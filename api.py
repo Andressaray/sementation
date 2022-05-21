@@ -2,8 +2,6 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import sementacion as s
 from fastapi.middleware.cors import CORSMiddleware
-import json
-
 class Info(BaseModel):
   text : str
 
@@ -16,10 +14,15 @@ app.add_middleware(
   allow_methods=["*"],
   allow_headers=["*"],
 )
-
+@app.get("/")
 @app.post("/text")
 def tranformWord(info: Info):
+  print(info)
   se = s.main(info.text)
-  print(se)
-  # text = se.cleanTweets(info.text)
-  return { 'status': 200, 'text': se }
+  return { 
+    'status': 200,
+    'body': {
+      # se.list_words,
+      # se.bag_words
+    }
+  }

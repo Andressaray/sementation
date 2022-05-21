@@ -1,20 +1,29 @@
 import pandas as pd
 import re
 import nltk
+nltk.download()
 import ssl
 from nltk.corpus import stopwords
 import spacy
 from deep_translator import GoogleTranslator
-
+from nltk.stem import PorterStemmer
+from nltk.stem import WordNetLemmatizer
+nltk.download('omw-1.4')
+nltk.download('wordnet')
 class main:
-  def __init__(self, text):
-    self.cleanTweets(self, text)
+  pStemmer = PorterStemmer()
+  lemmatizer = WordNetLemmatizer()
+  list_words = []
+  bag_words = {}
 
-  def traslateWord(self, text = ''):
+  def __init__(self, text):
+    self.clean_tweets(self, text)
+
+  def traslate_word(self, text = ''):
     new_text = GoogleTranslator(source='auto', target='es').translate(text)
     return new_text
 
-  def deleteAccents(self, text = ''):
+  def delete_accents(self, text = ''):
     replacements = (
       ("á", "a"),
       ("é", "e"),
@@ -26,7 +35,17 @@ class main:
       text = text.replace(a, b).replace(a, b)
     return text
 
-  def deleteEmojis(self, text = ''):
+  def conver_verbs(self, list = []):
+    for word in list:
+      aux_text = self.pStemmer.stem(word)
+      aux_text = self.lemmatizer.lemmatize(word)
+      if aux_text in self.bag_words:
+        self.bag_words[aux_text] = self.bag_words[aux_text] + 1
+      else: 
+        self.bag_words[aux_text] = 1
+      self.list_words.append(aux_text)
+
+  def delete_emojis(self, text = ''):
     emoji_pattern = re.compile("["
        u"\U0001F600-\U0001F64F"  # emoticons
        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -49,31 +68,31 @@ class main:
        "]+", flags=re.UNICODE)
     return emoji_pattern.sub(r'', text)
   
-  def cleanTweets(self, _, texts = ''):
+  def clean_tweets(self, _,texts = ''):
     text_separator = re.split(' ', texts)
     spacy.prefer_gpu()
     ssl._create_default_https_context = ssl._create_unverified_context
-    # nltk.download('punkt')
-    # nltk.download('stopwords')
-
     tokenizer = nltk.tokenize.WhitespaceTokenizer()
     es_stopwords = set(stopwords.words('spanish'))
     tokenizer = nltk.tokenize.WordPunctTokenizer()
-    list_words_dirty = []
     for text in text_separator:
       if pd.isnull(text) == False:
         aux_text = re.sub("([0-9]+)", '', text)
         aux_text = re.sub("'[^A-Za-z]+'", '', aux_text)
         aux_text = aux_text.lower()
-        aux_text = re.sub("([.;,:¡!¿?()@*$-//])+", ' ', aux_text)
-        aux_text = self.deleteEmojis(aux_text)
-        aux_text = self.deleteAccents(aux_text)
-        # aux_text = self.traslateWord(aux_text)
+        aux_text = re.sub("([.;,:¡!¿?()@*$-//…‼º°´’»|”“ªâ˜ <>\\=#])+", ' ', aux_text)
+        aux_text = self.delete_emojis(self, aux_text)
+        aux_text = self.delete_accents(self, aux_text)
+        aux_text = self.traslate_word(aux_text)
         aux_text = ' '.join(aux_text.split())
         tokens = tokenizer.tokenize(aux_text)
-        # aux_text = nlp(aux_text)
         aux_text = [aux_text for aux_text in tokens if not aux_text in es_stopwords]
-        list_words_dirty.append(aux_text)
-    return list_words_dirty
+        self.conver_verbs(self, aux_text)
+    print(self.bag_words)
+    return 'Hola'
+    # return {
+    #   self.bag_words,
+    #   self.list_words
+    # }
 
 
