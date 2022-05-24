@@ -17,12 +17,12 @@ app.add_middleware(
 @app.get("/")
 @app.post("/text")
 def tranformWord(info: Info):
-  print(info)
   se = s.main(info.text)
   return { 
     'status': 200,
     'body': {
-      # se.list_words,
-      # se.bag_words
+      'badWords': se.bag_words,
+      'listWords': se.list_words,
+      'tweets': se.tweets
     }
   }

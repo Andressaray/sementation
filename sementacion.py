@@ -1,20 +1,23 @@
 import pandas as pd
 import re
 import nltk
-nltk.download()
+# nltk.download()
 import ssl
 from nltk.corpus import stopwords
 import spacy
 from deep_translator import GoogleTranslator
 from nltk.stem import PorterStemmer
 from nltk.stem import WordNetLemmatizer
-nltk.download('omw-1.4')
-nltk.download('wordnet')
+import itertools
+
+# nltk.download('omw-1.4')
+# nltk.download('wordnet')
 class main:
   pStemmer = PorterStemmer()
   lemmatizer = WordNetLemmatizer()
   list_words = []
   bag_words = {}
+  tweets = []
 
   def __init__(self, text):
     self.clean_tweets(self, text)
@@ -36,6 +39,7 @@ class main:
     return text
 
   def conver_verbs(self, list = []):
+    list_aux = []
     for word in list:
       aux_text = self.pStemmer.stem(word)
       aux_text = self.lemmatizer.lemmatize(word)
@@ -44,6 +48,8 @@ class main:
       else: 
         self.bag_words[aux_text] = 1
       self.list_words.append(aux_text)
+      list_aux.append(aux_text)
+    # self.tweets.append(list_aux)
 
   def delete_emojis(self, text = ''):
     emoji_pattern = re.compile("["
@@ -68,7 +74,8 @@ class main:
        "]+", flags=re.UNICODE)
     return emoji_pattern.sub(r'', text)
   
-  def clean_tweets(self, _,texts = ''):
+  def clean_tweets(self, _, texts = ''):
+    texts = " ".join(re.findall("[A-Z][^A-Z]*", texts))
     text_separator = re.split(' ', texts)
     spacy.prefer_gpu()
     ssl._create_default_https_context = ssl._create_unverified_context
@@ -80,19 +87,14 @@ class main:
         aux_text = re.sub("([0-9]+)", '', text)
         aux_text = re.sub("'[^A-Za-z]+'", '', aux_text)
         aux_text = aux_text.lower()
-        aux_text = re.sub("([.;,:¡!¿?()@*$-//…‼º°´’»|”“ªâ˜ <>\\=#])+", ' ', aux_text)
-        aux_text = self.delete_emojis(self, aux_text)
-        aux_text = self.delete_accents(self, aux_text)
-        aux_text = self.traslate_word(aux_text)
+        aux_text = re.sub("([.;,:¡!¿?()@*$-//…‼º°´’»|”“ªâ˜<>\\=#])+", ' ', aux_text)
+        aux_text = self.delete_emojis(aux_text)
+        aux_text = self.delete_accents(aux_text)
+        # aux_text = self.traslate_word(aux_text)
         aux_text = ' '.join(aux_text.split())
         tokens = tokenizer.tokenize(aux_text)
         aux_text = [aux_text for aux_text in tokens if not aux_text in es_stopwords]
-        self.conver_verbs(self, aux_text)
-    print(self.bag_words)
-    return 'Hola'
-    # return {
-    #   self.bag_words,
-    #   self.list_words
-    # }
+        self.conver_verbs(aux_text)
+    return [self.bag_words, self.list_words]
 
 
