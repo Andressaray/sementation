@@ -34,7 +34,7 @@ def delete_accents(text = ''):
 def conver_verbs(list_words = []):
   list_verbs = []
   for word in list_words:
-    aux_text = pStemmer.stem(word)
+    #aux_text = pStemmer.stem(word)
     aux_text = lemmatizer.lemmatize(word)
     if aux_text in bag_words:
       bag_words[aux_text] = bag_words[aux_text] + 1
@@ -79,7 +79,7 @@ def clean_tweets(key = ''):
       aux_text = re.sub("([0-9]+)", '', text)
       aux_text = re.sub("'[^A-Za-z]+'", '', aux_text)
       aux_text = aux_text.lower()
-      aux_text = re.sub("([.;,:¡!¿?()@*$-//…‼º°´’»|”“ªâ˜ <>\\=#])+", ' ', aux_text)
+      aux_text = re.sub("([.;,:¡!¿?()@*$-//…‼º°´’»|~”“ªâ˜ <>\\=#])+", ' ', aux_text)
       aux_text = delete_emojis(aux_text)
       aux_text = delete_accents(aux_text)
       # aux_text = self.traslate_word(aux_text)
@@ -92,6 +92,6 @@ listWordsTitle = clean_tweets('Title')
 # print(listWordsTitle)
 
 bag_words = sorted(bag_words.items(), key = lambda kv:(kv[0], kv[1]))
-print(bag_words)
+print(listWordsTitle)
 # listWordsOpinion = clean_tweets('Opinion')
 
