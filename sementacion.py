@@ -75,6 +75,8 @@ class main:
     return emoji_pattern.sub(r'', text)
   
   def clean_tweets(self, _, texts = ''):
+    self.bag_words = {}
+    self.list_words = []
     texts = " ".join(re.findall("[A-Z][^A-Z]*", texts))
     text_separator = re.split(' ', texts)
     spacy.prefer_gpu()

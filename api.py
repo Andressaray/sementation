@@ -21,7 +21,7 @@ def tranformWord(info: Info):
   return { 
     'status': 200,
     'body': {
-      'badWords': se.bag_words,
+      'bagWords': se.bag_words,
       'listWords': se.list_words,
       'tweets': se.tweets
     }
